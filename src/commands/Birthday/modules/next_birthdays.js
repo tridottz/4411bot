@@ -13,8 +13,8 @@ export default {
         if (next5.length === 0) {
             const embed = new EmbedBuilder()
                 .setColor(0xFF0000)
-                .setTitle('No Birthdays Found')
-                .setDescription('No birthdays have been set up in this server yet. Use `/birthday set` to add birthdays!');
+                .setTitle('No se encontraron cumpleaños')
+                .setDescription('Aún no se ha establecido ningún cumpleaños en este servidor. ¡Usa `/cumpleaños establecer` para agregar cumpleaños!');
             return await InteractionHelper.safeEditReply(interaction, {
                 embeds: [embed]
             });
@@ -31,61 +31,4 @@ export default {
 
             let timeUntil = '';
             if (birthday.daysUntil === 0) {
-                timeUntil = '🎉 **Today!**';
-            } else if (birthday.daysUntil === 1) {
-                timeUntil = '📅 **Tomorrow!**';
-            } else {
-                timeUntil = `In ${birthday.daysUntil} day${birthday.daysUntil > 1 ? 's' : ''}`;
-            }
-        }
-
-        if (displayIndex === 0) {
-            const embed = new EmbedBuilder()
-                .setColor(0xFF0000)
-                .setTitle('No Upcoming Birthdays')
-                .setDescription('No upcoming birthdays found for current server members.');
-            return await InteractionHelper.safeEditReply(interaction, {
-                embeds: [embed]
-            });
-        }
-
-        let birthdayList = `🎂 **Next 5 Upcoming Birthdays**\n\nHere are the next 5 birthdays in ${interaction.guild.name}:\n\n`;
-        displayIndex = 0;
-        for (const birthday of next5) {
-            const member = await interaction.guild.members.fetch(birthday.userId).catch(() => null);
-            if (!member) {
-                continue;
-            }
-            displayIndex++;
-
-            let timeUntil = '';
-            if (birthday.daysUntil === 0) {
-                timeUntil = '🎉 **Today!**';
-            } else if (birthday.daysUntil === 1) {
-                timeUntil = '📅 **Tomorrow!**';
-            } else {
-                timeUntil = `In ${birthday.daysUntil} day${birthday.daysUntil > 1 ? 's' : ''}`;
-            }
-
-            birthdayList += `${displayIndex}. **${member.displayName}**\n<@${birthday.userId}>\n📅 **Date:** ${birthday.monthName} ${birthday.day}\n⏰ **Time:** ${timeUntil}\n\n`;
-        }
-
-        birthdayList += `Use /birthday set to add your birthday!`;
-
-        const embed = new EmbedBuilder()
-            .setColor(0x00FF00)
-            .setTitle('Next 5 Upcoming Birthdays')
-            .setDescription(birthdayList);
-
-        await InteractionHelper.safeEditReply(interaction, {
-            embeds: [embed]
-        });
-
-        logger.info('Next birthdays retrieved successfully', {
-            userId: interaction.user.id,
-            guildId: interaction.guildId,
-            upcomingCount: displayIndex,
-            commandName: 'next_birthdays'
-        });
-    }
-};
+                timeUntil = '
