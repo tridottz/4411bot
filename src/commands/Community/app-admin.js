@@ -42,45 +42,45 @@ export default {
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addSubcommand((subcommand) =>
         subcommand
-            .setName("setup")
-            .setDescription("Set up a new application")
+            .setName("establecer")
+            .setDescription("Postulate")
     )
     .addSubcommand((subcommand) =>
         subcommand
-            .setName("review")
-            .setDescription("Approve or deny an application")
+            .setName("revisar")
+            .setDescription("Aprueba o niega una postulacion")
             .addStringOption((option) =>
                 option
                     .setName("id")
-                    .setDescription("The application ID")
+                    .setDescription("El id de postulacion")
                     .setRequired(true),
             ),
     )
     .addSubcommand((subcommand) =>
         subcommand
             .setName("list")
-            .setDescription("List all applications")
+            .setDescription("Lista d todas las postulaciones")
             .addStringOption((option) =>
                 option
-                    .setName("status")
-                    .setDescription("Filter by status")
+                    .setName("Estado")
+                    .setDescription("Filtrar por estado")
                     .addChoices(
-                        { name: "Pending", value: "pending" },
-                        { name: "Approved", value: "approved" },
-                        { name: "Denied", value: "denied" },
+                        { name: "Pendiente", value: "pendiente" },
+                        { name: "Aprobado", value: "aprobado" },
+                        { name: "Denegado", value: "denegado" },
                     ),
             )
             .addStringOption((option) =>
-                option.setName("role").setDescription("Filter by role ID"),
+                option.setName("role").setDescription("Filtrar po ID de rol"),
             )
             .addUserOption((option) =>
-                option.setName("user").setDescription("Filter by user"),
+                option.setName("user").setDescription("Filtrar por usuario"),
             )
             .addNumberOption((option) =>
                 option
-                    .setName("limit")
+                    .setName("limite")
                     .setDescription(
-                        "Maximum number of applications to show (default: 10)",
+                        "El numero maximo de postulaciones por mostrar (default: 10)",
                     )
                     .setMinValue(1)
                     .setMaxValue(25),
@@ -92,8 +92,8 @@ export default {
             .setDescription("Open the applications configuration dashboard")
             .addStringOption((option) =>
                 option
-                    .setName("application")
-                    .setDescription("Select an application to configure")
+                    .setName("postulacion")
+                    .setDescription("Selecciona una postulacion para configurar")
                     .setRequired(false)
                     .setAutocomplete(true),
             ),
@@ -103,7 +103,7 @@ export default {
 
     execute: withErrorHandling(async (interaction) => {
         if (!interaction.inGuild()) {
-            return await replyUserError(interaction, { type: ErrorTypes.UNKNOWN, message: 'This command can only be used in a server.' });
+            return await replyUserError(interaction, { type: ErrorTypes.UNKNOWN, message: 'Este comando solo puede ser utilizado en un servidor.' });
         }
 
         const { options, guild, member } = interaction;
@@ -121,14 +121,14 @@ export default {
 
         await ApplicationService.checkManagerPermission(interaction.client, guild.id, member);
 
-        if (subcommand === "setup") {
+        if (subcommand === "establecer") {
             await handleSetup(interaction);
-        } else if (subcommand === "review") {
+        } else if (subcommand === "revisar") {
             await handleReview(interaction);
-        } else if (subcommand === "list") {
+        } else if (subcommand === "lista") {
             await handleList(interaction);
         } else if (subcommand === "dashboard") {
-            const selectedAppName = interaction.options.getString("application");
+            const selectedAppName = interaction.options.getString("postulacion");
             await appDashboard.execute(interaction, null, interaction.client, selectedAppName);
         }
     }, { type: 'command', commandName: 'app-admin' })
@@ -137,21 +137,21 @@ export default {
 async function handleSetup(interaction) {
     
     if (interaction.deferred || interaction.replied) {
-        return await replyUserError(interaction, { type: ErrorTypes.UNKNOWN, message: 'This interaction has already been processed. Please try the command again.' });
+        return await replyUserError(interaction, { type: ErrorTypes.UNKNOWN, message: 'Esta interaccion esta en proceso. Porfavor prueba usar el comando de nuevo.' });
     }
 
     const modal = new ModalBuilder()
         .setCustomId('app_setup_modal')
-        .setTitle('Set Up New Application');
+        .setTitle('Agrega una nueva postulacion');
 
     const roleSelect = new RoleSelectMenuBuilder()
         .setCustomId('role_id')
-        .setPlaceholder('Select the role users will apply for')
+        .setPlaceholder('Selecciona el rol al que los usuarios se postularan')
         .setRequired(true);
 
     const roleLabel = new LabelBuilder()
-        .setLabel('Application Role')
-        .setDescription('The role that users will be applying for')
+        .setLabel('Rol de postulacion')
+        .setDescription('El rol al que los usuarios se estan postulando')
         .setRoleSelectMenuComponent(roleSelect);
 
     const appNameInput = new TextInputBuilder()
@@ -163,30 +163,30 @@ async function handleSetup(interaction) {
         .setRequired(true);
 
     const appNameLabel = new LabelBuilder()
-        .setLabel('Application Name')
+        .setLabel('Nombre de postulacion')
         .setTextInputComponent(appNameInput);
 
     const q1Input = new TextInputBuilder()
         .setCustomId('app_question_1')
         .setStyle(TextInputStyle.Short)
-        .setPlaceholder('Why do you want this role?')
+        .setPlaceholder('Por que quieres este rol?')
         .setMaxLength(100)
         .setMinLength(1)
         .setRequired(true);
 
     const q1Label = new LabelBuilder()
-        .setLabel('Question 1 (required)')
+        .setLabel('Pregunta 1 (Obligatoria)')
         .setTextInputComponent(q1Input);
 
     const q2Input = new TextInputBuilder()
         .setCustomId('app_question_2')
         .setStyle(TextInputStyle.Short)
-        .setPlaceholder('What experience do you have?')
+        .setPlaceholder('Tienes expriencia? Si es asi, especifica cual')
         .setMaxLength(100)
         .setRequired(false);
 
     const q2Label = new LabelBuilder()
-        .setLabel('Question 2 (optional)')
+        .setLabel('Pregunta 2 (opcional)')
         .setTextInputComponent(q2Input);
 
     const q3Input = new TextInputBuilder()
@@ -196,7 +196,7 @@ async function handleSetup(interaction) {
         .setRequired(false);
 
     const q3Label = new LabelBuilder()
-        .setLabel('Question 3 (optional)')
+        .setLabel('Pregunta 3 (opcional)')
         .setTextInputComponent(q3Input);
 
     modal.addLabelComponents(roleLabel, appNameLabel, q1Label, q2Label, q3Label);
@@ -220,7 +220,7 @@ async function handleSetup(interaction) {
     const roleId = selectedRoles.first()?.id;
 
     if (!roleId) {
-        await replyUserError(submitted, { type: ErrorTypes.USER_INPUT, message: 'You must select a role for the application.' });
+        await replyUserError(submitted, { type: ErrorTypes.USER_INPUT, message: 'Debes seleccionar al menos un rol para postularte.' });
         return;
     }
 
@@ -232,13 +232,13 @@ async function handleSetup(interaction) {
 
     const role = await interaction.guild.roles.fetch(roleId).catch(() => null);
     if (!role) {
-        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'The selected role could not be found.' });
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'El rol seleccionado es desconocido.' });
         return;
     }
 
     const existingRoles = await getApplicationRoles(interaction.client, interaction.guild.id);
     if (existingRoles.some(r => r.roleId === roleId)) {
-        await replyUserError(submitted, { type: ErrorTypes.CONFIGURATION, message: `The role ${role} is already configured as an application.` });
+        await replyUserError(submitted, { type: ErrorTypes.CONFIGURATION, message: `El rol ${role} ya esta configurado para una postulacion.` });
         return;
     }
 
@@ -259,8 +259,8 @@ async function handleSetup(interaction) {
 
     await submitted.reply({
         embeds: [successEmbed(
-            '✅ Application Created',
-            `**${appName}** application has been created for ${role}.\n\nYou can customize the log channel, manager roles, questions, and retention period in the dashboard.`,
+            '✅ Postulacion creada,
+            `**${appName}** La solicitud fue creada para ${role}.\n\nPuedes personalizar el canal de registros, roles de moderacion, preguntas, y el periodo de retencion en el dashboard.`,
         )],
         flags: ['Ephemeral'],
     });
@@ -279,24 +279,24 @@ async function handleReview(interaction) {
         appId,
     );
     if (!application) {
-        return await replyUserError(interaction, { type: ErrorTypes.USER_INPUT, message: 'Application not found.' });
+        return await replyUserError(interaction, { type: ErrorTypes.USER_INPUT, message: 'Solicitud no encontrada.' });
     }
 
     if (application.status !== "pending") {
-        return await replyUserError(interaction, { type: ErrorTypes.UNKNOWN, message: 'This application has already been processed.' });
+        return await replyUserError(interaction, { type: ErrorTypes.UNKNOWN, message: 'Esta solicitud esta siendo procesada' });
     }
 
     const appEmbed = createEmbed({
-        title: `Review Application`,
-        description: `**User:** <@${application.userId}>\n**Application:** ${application.roleName}\n**Application ID:** \`${appId}\``,
-        color: 'info',
+        title: `Revisar solicitud`,
+        description: `**Usuario:** <@${application.userId}>\n**Solicitud:** ${application.roleName}\n**ID de solicitud:** \`${appId}\``,
+        color: 'informacion',
     });
 
     if (application.answers && application.answers.length > 0) {
         application.answers.forEach((item, index) => {
             appEmbed.addFields({
                 name: `Q${index + 1}: ${item.question}`,
-                value: item.answer || '*No answer provided*',
+                value: item.answer || '*Sin respuesta*',
                 inline: false
             });
         });
@@ -305,11 +305,11 @@ async function handleReview(interaction) {
     const buttonRow = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId(`app_review_approve_${appId}`)
-            .setLabel('Approve')
+            .setLabel('Aprobar')
             .setStyle(ButtonStyle.Success),
         new ButtonBuilder()
             .setCustomId(`app_review_deny_${appId}`)
-            .setLabel('Deny')
+            .setLabel('Denegar')
             .setStyle(ButtonStyle.Danger),
     );
 
@@ -330,19 +330,19 @@ async function handleReview(interaction) {
     });
 
     collector.on('collect', async buttonInteraction => {
-        const isApprove = buttonInteraction.customId.includes('approve');
+        const isApprove = buttonInteraction.customId.includes('aprobar');
 
         const reasonModal = new ModalBuilder()
-            .setCustomId(`app_review_reason_${appId}_${isApprove ? 'approve' : 'deny'}`)
-            .setTitle(`${isApprove ? 'Approve' : 'Deny'} Application - Reason`);
+            .setCustomId(`app_review_reason_${appId}_${isApprove ? 'aprobar' : 'denegar'}`)
+            .setTitle(`${isApprove ? 'Aprobar' : 'Denegar'} Solicitud - Razon`);
 
         reasonModal.addComponents(
             new ActionRowBuilder().addComponents(
                 new TextInputBuilder()
                     .setCustomId('review_reason')
-                    .setLabel('Reason (optional)')
+                    .setLabel('Razon (opcional)')
                     .setStyle(TextInputStyle.Paragraph)
-                    .setPlaceholder('Provide a reason for this decision...')
+                    .setPlaceholder('Dinos la razon...')
                     .setMaxLength(500)
                     .setRequired(false),
             ),
@@ -354,15 +354,15 @@ async function handleReview(interaction) {
             const reasonSubmit = await buttonInteraction.awaitModalSubmit({
                 time: 5 * 60 * 1000, 
                 filter: i =>
-                    i.customId === `app_review_reason_${appId}_${isApprove ? 'approve' : 'deny'}` &&
+                    i.customId === `app_review_reason_${appId}_${isApprove ? 'aprobar' : 'denegar'}` &&
                     i.user.id === buttonInteraction.user.id,
             }).catch(() => null);
 
             if (!reasonSubmit) return;
 
-            const reason = reasonSubmit.fields.getTextInputValue('review_reason').trim() || "No reason provided.";
-            const action = isApprove ? 'approve' : 'deny';
-            const status = isApprove ? 'approved' : 'denied';
+            const reason = reasonSubmit.fields.getTextInputValue('review_reason').trim() || "Ninguna razon contribuida.";
+            const action = isApprove ? 'approve' : 'denegar';
+            const status = isApprove ? 'approved' : 'denegada';
 
             const updatedApplication = await ApplicationService.reviewApplication(
                 reasonSubmit.client,
@@ -381,14 +381,14 @@ async function handleReview(interaction) {
                 const reviewStatus = getApplicationStatusPresentation(status);
                 const dmEmbed = createEmbed({
                     title: `${reviewStatus.statusEmoji} Application ${reviewStatus.statusLabel}`,
-                    description: `Your application for **${application.roleName}** has been **${status}**\n` +
-                        `**Note:** ${reason}\n\n` +
-                        `Use \`/apply status id:${appId}\` to view details.`
+                    description: `Tu solicitud de **${application.roleName}** ha sido **${status}**\n` +
+                        `**Nota:** ${reason}\n\n` +
+                        `Usa \`/postulacion estado id:${appId}\` para ver detalles.`
                 }).setColor(statusColor);
 
                 await user.send({ embeds: [dmEmbed] });
             } catch (error) {
-                logger.warn('Failed to send DM to user for application review', {
+                logger.warn('No se pudo enviar mensaje al postulante', {
                     error: error.message,
                     userId: application.userId,
                     applicationId: appId
@@ -424,7 +424,7 @@ async function handleReview(interaction) {
                         }
                     }
                 } catch (error) {
-                    logger.warn('Failed to update log message for application', {
+                    logger.warn('Fallo al intentar modificar el registro para la postulacion', {
                         error: error.message,
                         applicationId: appId,
                         logMessageId: application.logMessageId
@@ -439,7 +439,7 @@ async function handleReview(interaction) {
                     );
                     await member.roles.add(application.roleId);
                 } catch (error) {
-                    logger.error('Failed to assign role to approved applicant', {
+                    logger.error('Error al intentar asignar el rol al solicitante aprobado', {
                         error: error.message,
                         userId: application.userId,
                         roleId: application.roleId,
@@ -451,16 +451,16 @@ async function handleReview(interaction) {
             await reasonSubmit.reply({
                 embeds: [
                     successEmbed(
-                        `Application ${status}`,
-                        `The application has been **${status}**.`,
+                        `Solicitud ${status}`,
+                        `La solicitud fue **${status}**.`,
                     ),
                 ],
                 flags: ["Ephemeral"],
             });
 
         } catch (error) {
-            logger.error('Error reviewing application:', error);
-            await replyUserError(buttonInteraction, { type: ErrorTypes.UNKNOWN, message: 'An error occurred while reviewing the application.' });
+            logger.error('Error revisando la solicitud:', error);
+            await replyUserError(buttonInteraction, { type: ErrorTypes.UNKNOWN, message: 'Ocurrio un error al intentar revisar la solicitud.' });
         }
     });
 
@@ -490,7 +490,7 @@ async function handleList(interaction) {
     if (status) {
         filters.status = status;
     } else {
-        filters.status = 'pending';
+        filters.status = 'pendiente';
     }
 
     let applications = await getApplications(
@@ -523,29 +523,29 @@ async function handleList(interaction) {
         
         if (applicationRoles.length > 0) {
             const embed = createEmbed({ 
-                title: "No Applications Found", 
-                description: "No submitted applications found matching the specified criteria.\n\nHowever, the following application roles are configured:" 
+                title: "Sin solicitudes encontradas", 
+                description: "Sin solicitudes encontradas siguendo el criterio. \n\nDe igual forma los roles fueron aplicados:" 
             });
 
             applicationRoles.forEach((appRole, index) => {
                 const role = interaction.guild.roles.cache.get(appRole.roleId);
                 embed.addFields({
                     name: `${index + 1}. ${appRole.name}`,
-                    value: `**Role:** ${role ?`<@&${appRole.roleId}>`: 'Role not found'}\n**Available for applications:** Yes`,
+                    value: `**Role:** ${role ?`<@&${appRole.roleId}>`: 'Rol no encontrado'}\n**Disponible para postulaciones:** Si`,
                     inline: false
                 });
             });
 
             embed.setFooter({
-                text: "Users can apply with /apply submit or see available roles with /apply list"
+                text: "Los usuarios pueden postularse con /postulacion crear o ver los roles disponibles con /postulacion lista"
             });
 
             return InteractionHelper.safeEditReply(interaction, { embeds: [embed], flags: ["Ephemeral"] });
         } else {
             return await replyUserError(interaction, {
                 type: ErrorTypes.CONFIGURATION,
-                message: 'No applications found and no application roles configured.\n' +
-                    'Use `/app-admin roles add` to configure application roles first.'
+                message: 'Sin solicitudes encontradas y sin roles configurados.\n' +
+                    'Usa `/postulaciones-admin roles agregar` para configurar los roles de solicitudes primero.'
             });
         }
     }
@@ -554,12 +554,12 @@ async function handleList(interaction) {
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, limit);
 
-    const embed = createEmbed({ title: "Submitted Applications", description: `Showing ${applications.length} applications.`, });
+    const embed = createEmbed({ title: "Solicitudes creadas", description: `Mostrando ${applications.length} solicitudes`, });
 
     applications.forEach((app) => {
         const statusView = getApplicationStatusPresentation(app?.status);
-        const roleName = app?.roleName || 'Unknown Role';
-        const username = app?.username || 'Unknown User';
+        const roleName = app?.roleName || 'Rol desconocido';
+        const username = app?.username || 'Usuario desconocido';
         const createdAt = app?.createdAt ? new Date(app.createdAt) : null;
         const createdAtDisplay = createdAt && !Number.isNaN(createdAt.getTime())
             ? createdAt.toLocaleString()
@@ -569,8 +569,8 @@ async function handleList(interaction) {
             name: `${statusView.statusEmoji} ${roleName} - ${username}`,
             value:
                 `**ID:** \`${app.id}\`\n` +
-                `**Status:** ${statusView.statusEmoji} ${statusView.statusLabel}\n` +
-                `**Date:** ${createdAtDisplay}`,
+                `**Estado:** ${statusView.statusEmoji} ${statusView.statusLabel}\n` +
+                `**Fecha:** ${createdAtDisplay}`,
             inline: true,
         });
     });
