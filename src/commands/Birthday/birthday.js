@@ -80,7 +80,7 @@ export default {
         switch (subcommand) {
             case 'establecer':
                 return await birthdaySet.execute(interaction, config, client);
-            case 'informacion':
+            case 'información':
                 return await birthdayInfo.execute(interaction, config, client);
             case 'lista':
                 return await birthdayList.execute(interaction, config, client);
