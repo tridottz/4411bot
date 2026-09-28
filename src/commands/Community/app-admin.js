@@ -22,14 +22,14 @@ import appDashboard from './modules/app_dashboard.js';
 function getApplicationStatusPresentation(statusValue) {
     const normalized = typeof statusValue === 'string' ? statusValue.trim().toLowerCase() : 'unknown';
     const statusLabel =
-        normalized === 'pending' ? 'In Progress' :
-        normalized === 'approved' ? 'Accepted' :
-        normalized === 'denied' ? 'Denied' :
+        normalized === 'pendiente' ? 'En progreso' :
+        normalized === 'aprobado' ? 'Aceptado' :
+        normalized === 'denegado' ? 'Denegado' :
         'Unknown';
     const statusEmoji =
-        normalized === 'pending' ? '🟡' :
-        normalized === 'approved' ? '🟢' :
-        normalized === 'denied' ? '🔴' :
+        normalized === 'pendiente' ? '🟡' :
+        normalized === 'aprobado' ? '🟢' :
+        normalized === 'denegado' ? '🔴' :
         '⚪';
 
     return { normalized, statusLabel, statusEmoji };
