@@ -7,7 +7,7 @@ export default {
     async execute(interaction, config, client) {
         await InteractionHelper.safeDefer(interaction);
 
-        const targetUser = interaction.options.getUser("user") || interaction.user;
+        const targetUser = interaction.options.getUser("usuario") || interaction.user;
         const userId = targetUser.id;
         const guildId = interaction.guildId;
 
@@ -16,10 +16,10 @@ export default {
         if (!birthdayData) {
             const embed = new EmbedBuilder()
                 .setColor(0xFF0000)
-                .setTitle('No Birthday Found')
+                .setTitle('No se encontró cumpleaños')
                 .setDescription(targetUser.id === interaction.user.id 
-                    ? "You haven't set your birthday yet. Use `/birthday set` to add it!"
-                    : `${targetUser.username} hasn't set their birthday yet.`);
+                    ? "Aún no has establecido tu cumpleaños. ¡Usa `/cumpleaños establecer` para agregarlo!"
+                    : `${targetUser.username} aún no ha establecido su cumpleaños.`);
             return await InteractionHelper.safeEditReply(interaction, {
                 embeds: [embed]
             });
@@ -27,8 +27,8 @@ export default {
 
         const embed = new EmbedBuilder()
             .setColor(0x00FF00)
-            .setTitle('Birthday Information')
-            .setDescription(`**Date:** ${birthdayData.monthName} ${birthdayData.day}\n**User:** ${targetUser.toString()}`);
+            .setTitle('Información de cumpleaños')
+            .setDescription(`**Fecha:** ${birthdayData.monthName} ${birthdayData.day}\n**Usuario:** ${targetUser.toString()}`);
 
         await InteractionHelper.safeEditReply(interaction, {
             embeds: [embed]
