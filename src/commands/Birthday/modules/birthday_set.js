@@ -6,8 +6,8 @@ export default {
     async execute(interaction, config, client) {
         await InteractionHelper.safeDefer(interaction);
 
-        const month = interaction.options.getInteger("month");
-        const day = interaction.options.getInteger("day");
+        const month = interaction.options.getInteger("mes");
+        const day = interaction.options.getInteger("día");
         const userId = interaction.user.id;
         const guildId = interaction.guildId;
 
@@ -15,8 +15,8 @@ export default {
 
         const embed = new EmbedBuilder()
             .setColor(0x00FF00)
-            .setTitle('Birthday Set!')
-            .setDescription(`Your birthday has been set to **${result.data.monthName} ${result.data.day}**!`);
+            .setTitle('¡Cumpleaños establecido!')
+            .setDescription(`Tu cumpleaños se estableció el **${result.data.monthName} ${result.data.day}**.`);
 
         await InteractionHelper.safeEditReply(interaction, {
             embeds: [embed]
